@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker build:*)",
+      "Bash(open:*)",
+      "Bash(docker info:*)",
+      "Bash(npm install:*)",
+      "Bash(docker run:*)",
+      "Bash(docker stop:*)",
+      "Bash(docker rm:*)",
+      "Bash(docker logs:*)",
+      "Bash(curl:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "Bash(docker exec:*)",
+      "Bash(cat:*)",
+      "Bash(xargs:*)",
+      "Bash(ls:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
