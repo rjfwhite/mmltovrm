@@ -37,18 +37,27 @@ RUN mkdir -p /root/.config/blender/${BLENDER_VERSION}/extensions/user_default &&
 
 # Set up Node.js application
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
 
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy application code
 COPY . .
+
+# Build Next.js application
+RUN npm run build
 
 # Create directories for file operations
 RUN mkdir -p /tmp/uploads /tmp/outputs
 
-# Set environment variable for Blender
+# Set environment variables
 ENV BLENDER_PATH=/usr/local/bin/blender
 ENV PORT=8080
+ENV NODE_ENV=production
 
 EXPOSE 8080
 
-CMD ["node", "server.js"]
+CMD ["npm", "start"]

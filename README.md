@@ -1,10 +1,12 @@
 # GLB to VRM Converter Service
 
-A containerized Node.js service that converts GLB files to VRM format using headless Blender 4.2+.
+A Next.js TypeScript application that converts GLB files to VRM format using headless Blender 4.2+.
 
 ## Features
 
-- REST API for GLB to VRM conversion
+- Next.js API routes for GLB to VRM conversion
+- TypeScript for type safety
+- Support for MML (layered avatar) format
 - Headless Blender processing
 - Docker containerized for easy deployment
 - Google Cloud Run compatible
@@ -12,7 +14,7 @@ A containerized Node.js service that converts GLB files to VRM format using head
 
 ## API Endpoints
 
-### POST /convert
+### POST /api/convert
 
 Converts a GLB file to VRM format.
 
@@ -31,10 +33,52 @@ Converts a GLB file to VRM format.
 curl -X POST \
   -F "glb=@your-model.glb" \
   -o output.vrm \
-  http://localhost:8080/convert
+  http://localhost:3000/api/convert
 ```
 
-### GET /health
+### POST /api/convert-mml
+
+Converts an MML URL to VRM format.
+
+**Request:**
+- Method: `POST`
+- Content-Type: `application/json`
+- Body: `{ "mmlUrl": "https://example.com/avatar.mml" }`
+
+**Response:**
+- Success (200): Returns the VRM file as `model/gltf-binary`
+- Error (400/500): JSON error response
+
+**Example using curl:**
+
+```bash
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"mmlUrl": "https://example.com/avatar.mml"}' \
+  -o output.vrm \
+  http://localhost:3000/api/convert-mml
+```
+
+### GET /api/convert-url
+
+Auto-detects file type and converts GLB or MML URL to VRM format.
+
+**Request:**
+- Method: `GET`
+- Query parameter: `url` - URL to the GLB or MML file
+
+**Response:**
+- Success (200): Returns the VRM file as `model/gltf-binary`
+- Error (400/500): JSON error response
+
+**Example using curl:**
+
+```bash
+curl "http://localhost:3000/api/convert-url?url=https://example.com/model.glb" \
+  -o output.vrm
+```
+
+### GET /api/health
 
 Health check endpoint for monitoring.
 
@@ -55,9 +99,14 @@ Health check endpoint for monitoring.
 ### Run Locally (without Docker)
 
 ```bash
+# Install dependencies
 npm install
-npm start
+
+# Run development server
+npm run dev
 ```
+
+The application will be available at `http://localhost:3000`.
 
 Note: You'll need Blender 4.2+ installed locally and the `BLENDER_PATH` environment variable set.
 
@@ -71,6 +120,8 @@ docker build -t glb-to-vrm-converter .
 docker run -p 8080:8080 glb-to-vrm-converter
 ```
 
+The application will be available at `http://localhost:8080`.
+
 ### Test the service
 
 ```bash
@@ -78,7 +129,7 @@ docker run -p 8080:8080 glb-to-vrm-converter
 curl -X POST \
   -F "glb=@test-model.glb" \
   -o output.vrm \
-  http://localhost:8080/convert
+  http://localhost:3000/api/convert
 ```
 
 ## Deployment to Google Cloud Run
@@ -165,19 +216,55 @@ gcloud run services update glb-to-vrm-converter \
 ## File Size Limits
 
 - Maximum upload size: 100MB
-- Can be adjusted in `server.js` by modifying the `multer` configuration
+- Can be adjusted in `next.config.js` by modifying the `bodySizeLimit` configuration
 
 ## Architecture
 
-1. Client uploads GLB file via POST request
-2. Express server receives file and saves to `/tmp/uploads/`
+### GLB Upload Flow
+1. Client uploads GLB file via POST request to `/api/convert`
+2. Next.js API route receives file and saves to `/tmp/uploads/`
 3. Server spawns Blender in headless mode with Python conversion script
 4. Python script:
    - Imports GLB file
    - Sets VRM spec version to 0.0
+   - Auto-assigns VRM humanoid bones
    - Exports as VRM format
 5. Server returns VRM file to client
 6. Temporary files are cleaned up
+
+### MML Conversion Flow
+1. Client provides MML URL via POST request to `/api/convert-mml`
+2. Server downloads and parses MML file
+3. Downloads base GLB and any additional model GLBs
+4. If multi-part, merges all GLBs using Blender
+5. Converts merged/base GLB to VRM
+6. Returns VRM file to client
+7. Temporary files are cleaned up
+
+### Project Structure
+```
+/
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   │   ├── convert/route.ts          # GLB upload endpoint
+│   │   │   ├── convert-mml/route.ts      # MML conversion endpoint
+│   │   │   ├── convert-url/route.ts      # Auto-detect URL endpoint
+│   │   │   └── health/route.ts           # Health check endpoint
+│   │   ├── page.tsx                      # Homepage
+│   │   └── layout.tsx                    # Root layout
+│   └── lib/
+│       ├── blender.ts                    # Blender utilities
+│       └── mml-handler.ts                # MML parsing and processing
+├── blender_scripts/
+│   ├── convert_glb_to_vrm.py            # Main conversion script
+│   ├── merge_glb_files.py               # GLB merging script
+│   └── ...
+├── next.config.js                        # Next.js configuration
+├── tsconfig.json                         # TypeScript configuration
+├── package.json                          # Dependencies
+└── Dockerfile                            # Container configuration
+```
 
 ## Troubleshooting
 

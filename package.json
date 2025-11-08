@@ -2,10 +2,12 @@
   "name": "glb-to-vrm-converter",
   "version": "1.0.0",
   "description": "Headless Blender-based GLB to VRM converter service",
-  "main": "server.js",
+  "main": "src/app/page.tsx",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "keywords": [
     "glb",
@@ -17,14 +19,17 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
-    "multer": "^1.4.5-lts.1",
+    "next": "^14.2.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
     "@gltf-transform/core": "^4.0.0",
-    "@gltf-transform/functions": "^4.0.0",
-    "node-fetch": "^2.7.0"
+    "@gltf-transform/functions": "^4.0.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "@types/node": "^20.11.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.3.0"
   },
   "engines": {
     "node": ">=18.0.0"
