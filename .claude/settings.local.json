@@ -15,7 +15,9 @@
       "Bash(docker exec:*)",
       "Bash(cat:*)",
       "Bash(xargs:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "Bash(git mv:*)"
     ],
     "deny": [],
     "ask": []

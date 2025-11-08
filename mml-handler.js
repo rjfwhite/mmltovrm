@@ -44,7 +44,7 @@ function parseMML(mmlContent) {
  */
 async function mergeGLBFiles(baseGlbPath, additionalGlbPaths, outputPath) {
   const BLENDER_PATH = process.env.BLENDER_PATH || 'blender';
-  const scriptPath = path.join(__dirname, 'merge_glb_files.py');
+  const scriptPath = path.join(__dirname, 'blender_scripts', 'merge_glb_files.py');
 
   return new Promise((resolve, reject) => {
     const args = [

@@ -20,7 +20,7 @@ async function ensureVrmAddonEnabled() {
   if (vrmAddonEnabled) return true;
 
   console.log('Enabling VRM addon...');
-  const scriptPath = '/opt/enable_vrm_addon.py';
+  const scriptPath = path.join(__dirname, 'blender_scripts', 'enable_vrm_addon.py');
 
   try {
     await new Promise((resolve, reject) => {
@@ -409,7 +409,7 @@ app.get('/convert-url', async (req, res) => {
  */
 function runBlenderConversion(inputPath, outputPath, requestId) {
   return new Promise((resolve, reject) => {
-    const scriptPath = path.join(__dirname, 'convert_glb_to_vrm.py');
+    const scriptPath = path.join(__dirname, 'blender_scripts', 'convert_glb_to_vrm.py');
 
     const args = [
       '--background',
